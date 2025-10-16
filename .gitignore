@@ -12,4 +12,17 @@ web-build/
 .env
 .env.local
 .env.production
-firebaseConfig.js *.log
+*.log
+
+# Firebase credentials - DO NOT COMMIT
+firebaseConfig.js
+google-services.json
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
