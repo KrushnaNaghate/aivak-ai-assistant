@@ -26,3 +26,4 @@ google-services.json
 .Trashes
 ehthumbs.db
 Thumbs.db
+src/services/geminiService.ts
