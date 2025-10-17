@@ -23,7 +23,7 @@ A production-ready React Native chatbot application built with Expo, featuring G
 
 ## 📱 Screenshots
 
-[Add screenshots of login, chat, and profile screens]
+Comming Soon
 
 ## 🚀 Quick Start
 
