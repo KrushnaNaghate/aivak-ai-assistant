@@ -14,9 +14,10 @@ web-build/
 .env.production
 *.log
 
-# Firebase credentials - DO NOT COMMIT
+# 🔒 SECURITY - Never commit these files
 firebaseConfig.js
 google-services.json
+src/services/geminiService.ts
 
 # OS generated files
 .DS_Store

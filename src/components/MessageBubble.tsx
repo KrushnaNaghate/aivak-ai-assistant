@@ -1,5 +1,6 @@
 import React from "react";
 import { StyleSheet, View } from "react-native";
+import Markdown from "react-native-markdown-display";
 import { Avatar, Card, Text } from "react-native-paper";
 
 interface Message {
@@ -16,6 +17,35 @@ interface Props {
 const MessageBubble: React.FC<Props> = ({ message }) => {
   const isUser = message.isUser;
 
+  // ✅ Markdown styles for AI responses
+  const markdownStyles = {
+    body: {
+      color: isUser ? "white" : "#333",
+      fontSize: 16,
+      lineHeight: 20,
+    },
+    strong: {
+      color: isUser ? "white" : "#1565C0",
+      fontWeight: "bold",
+    },
+    em: {
+      color: isUser ? "white" : "#333",
+      fontStyle: "italic",
+    },
+    paragraph: {
+      marginVertical: 2,
+    },
+    bullet_list: {
+      marginVertical: 4,
+    },
+    ordered_list: {
+      marginVertical: 4,
+    },
+    list_item: {
+      marginVertical: 1,
+    },
+  };
+
   return (
     <View
       key={message.id}
@@ -30,12 +60,19 @@ const MessageBubble: React.FC<Props> = ({ message }) => {
         style={[styles.bubble, isUser ? styles.userBubble : styles.botBubble]}
       >
         <Card.Content style={styles.content}>
+          {/* ✅ Use Markdown for AI responses, plain text for user */}
+          {isUser ? (
+            <Text style={[styles.text, styles.userText]}>{message.text}</Text>
+          ) : (
+            <Markdown style={markdownStyles}>{message.text}</Markdown>
+          )}
+
           <Text
-            style={[styles.text, isUser ? styles.userText : styles.botText]}
+            style={[
+              styles.timestamp,
+              isUser ? styles.userTimestamp : styles.botTimestamp,
+            ]}
           >
-            {message.text}
-          </Text>
-          <Text style={styles.timestamp}>
             {new Date(message.timestamp).toLocaleTimeString([], {
               hour: "2-digit",
               minute: "2-digit",
@@ -66,7 +103,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 8,
   },
   bubble: {
-    maxWidth: "70%",
+    maxWidth: "75%",
     minWidth: "20%",
   },
   userBubble: {
@@ -93,6 +130,12 @@ const styles = StyleSheet.create({
     fontSize: 11,
     marginTop: 4,
     opacity: 0.7,
+  },
+  userTimestamp: {
+    color: "white",
+  },
+  botTimestamp: {
+    color: "#666",
   },
 });
 
