@@ -1,22 +1,19 @@
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import React, { useEffect, useRef, useState } from "react";
 import {
-  Alert,
+  Dimensions,
   FlatList,
+  ImageBackground,
   KeyboardAvoidingView,
   Platform,
   StyleSheet,
+  TextInput,
+  TouchableOpacity,
   View,
 } from "react-native";
-import {
-  ActivityIndicator,
-  Appbar,
-  IconButton,
-  Text,
-  TextInput,
-} from "react-native-paper";
+import { ActivityIndicator, Avatar, Text, useTheme } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useDispatch, useSelector } from "react-redux";
-
 import MessageBubble from "../components/MessageBubble";
 import geminiService from "../services/geminiService";
 import {
@@ -26,191 +23,209 @@ import {
 } from "../store/slices/chatSlice";
 import { RootState } from "../store/store";
 
-interface Props {
-  navigation: any;
-}
-
-const ChatScreen: React.FC<Props> = ({ navigation }) => {
-  const [inputText, setInputText] = useState("");
+const ChatScreen = ({ navigation }: any) => {
+  const theme = useTheme();
+  const [input, setInput] = useState("");
   const flatListRef = useRef<FlatList>(null);
-
   const dispatch = useDispatch();
-  const { messages, isLoading, sessionId } = useSelector(
-    (state: RootState) => state.chat
-  );
+  const { messages, isLoading } = useSelector((state: RootState) => state.chat);
   const { user } = useSelector((state: RootState) => state.auth);
+  const windowHeight = Dimensions.get("window").height;
 
-  // ✅ Initialize chat session with welcome message
+  // Init session
   useEffect(() => {
-    if (!sessionId || messages.length === 0) {
+    if (messages.length === 0) {
       dispatch(reinitializeChat({ user }));
     }
-  }, [dispatch, user, sessionId, messages.length]);
+  }, [dispatch]);
 
-  const sendMessage = async () => {
-    if (!inputText.trim() || isLoading) return;
-
-    // Create unique ID for user message
-    const userMessageId =
-      "user-" + Date.now() + "-" + Math.random().toString(36).substr(2, 9);
-
+  // Handle send
+  const handleSend = async () => {
+    if (!input.trim() || isLoading) return;
     const userMessage = {
-      id: userMessageId,
-      text: inputText.trim(),
+      id: Date.now().toString(),
+      text: input.trim(),
       isUser: true,
       timestamp: Date.now(),
     };
-
     dispatch(addMessage(userMessage));
-    setInputText("");
+    setInput("");
     dispatch(setLoading(true));
-
     try {
-      const response = await geminiService.generateResponse(
-        inputText.trim(),
-        messages
-      );
-
-      // Create unique ID for bot message
-      const botMessageId =
-        "bot-" + Date.now() + "-" + Math.random().toString(36).substr(2, 9);
-
+      const reply = await geminiService.generateResponse(input, messages);
       const botMessage = {
-        id: botMessageId,
-        text: response,
+        id: Date.now() + 1 + "",
+        text: reply,
         isUser: false,
         timestamp: Date.now(),
       };
-
       dispatch(addMessage(botMessage));
-    } catch (error: any) {
-      Alert.alert("Error", "Failed to get AI response. Please try again.");
-      console.error("Gemini API Error:", error);
+    } catch (err) {
+      console.log(err);
     } finally {
       dispatch(setLoading(false));
     }
   };
 
-  const renderMessage = ({ item }: { item: any }) => (
-    <MessageBubble message={item} />
-  );
-
-  const keyExtractor = (item: any) => item.id;
+  const renderItem = ({ item }: any) => <MessageBubble message={item} />;
 
   return (
-    <SafeAreaView style={styles.container}>
-      <Appbar.Header style={styles.header}>
-        <Appbar.Content
-          title="AIVAK AI Assistant"
-          subtitle="Your Business Companion"
-          titleStyle={styles.headerTitle}
-        />
-        <Appbar.Action
-          icon="account-circle"
-          onPress={() => navigation.navigate("Profile")}
-        />
-      </Appbar.Header>
+    <ImageBackground
+      source={{
+        uri: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1500&q=80",
+      }}
+      style={[styles.bg, { height: windowHeight }]}
+      imageStyle={{ opacity: 0.1 }}
+    >
+      <SafeAreaView style={styles.container}>
+        {/* Header */}
+        <View style={styles.appHeader}>
+          <View style={styles.headerLeft}>
+            <Avatar.Image
+              size={42}
+              source={{
+                uri: "https://cdn-icons-png.flaticon.com/512/4712/4712035.png",
+              }}
+            />
+            <View style={styles.headerText}>
+              <Text variant="titleMedium" style={styles.headerTitle}>
+                AIVAK
+              </Text>
+              <Text style={styles.subHeader}>Powered by Gemini AI</Text>
+            </View>
+          </View>
+          <TouchableOpacity
+            style={styles.profileButton}
+            onPress={() => navigation.navigate("Profile")}
+          >
+            <MaterialCommunityIcons
+              name="account-circle-outline"
+              size={28}
+              color="#fff"
+            />
+          </TouchableOpacity>
+        </View>
 
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        style={styles.chatContainer}
-      >
+        {/* Chat Area */}
         <FlatList
           ref={flatListRef}
           data={messages}
-          renderItem={renderMessage}
-          keyExtractor={keyExtractor}
-          style={styles.messagesList}
+          renderItem={renderItem}
+          keyExtractor={(item) => item.id}
           onContentSizeChange={() => flatListRef.current?.scrollToEnd()}
           onLayout={() => flatListRef.current?.scrollToEnd()}
-          removeClippedSubviews={false}
-          initialNumToRender={20}
-          maxToRenderPerBatch={10}
-          windowSize={10}
+          contentContainerStyle={styles.listContent}
         />
 
         {isLoading && (
-          <View style={styles.loadingContainer}>
-            <ActivityIndicator size="small" />
-            <Text style={styles.loadingText}>AI is thinking...</Text>
+          <View style={styles.loaderContainer}>
+            <ActivityIndicator size="small" color="#00b8f4" />
+            <Text style={styles.thinkingText}>AI thinking...</Text>
           </View>
         )}
 
-        <View style={styles.inputContainer}>
-          <TextInput
-            value={inputText}
-            onChangeText={setInputText}
-            placeholder="Ask me anything about your business..."
-            mode="outlined"
-            style={styles.textInput}
-            multiline
-            maxLength={500}
-            disabled={isLoading}
-          />
-          <IconButton
-            icon="send"
-            size={24}
-            onPress={sendMessage}
-            disabled={!inputText.trim() || isLoading}
-            style={[
-              styles.sendButton,
-              inputText.trim() && !isLoading ? styles.sendButtonActive : {},
-            ]}
-          />
-        </View>
-      </KeyboardAvoidingView>
-    </SafeAreaView>
+        {/* Input Bar */}
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+        >
+          <View style={styles.inputBar}>
+            <TextInput
+              placeholder="Ask AIVAK anything..."
+              value={input}
+              onChangeText={setInput}
+              style={styles.textBox}
+              placeholderTextColor="#999"
+              multiline
+            />
+            <TouchableOpacity
+              onPress={handleSend}
+              disabled={!input.trim() || isLoading}
+              style={[styles.sendButton, { opacity: input.trim() ? 1 : 0.5 }]}
+            >
+              <MaterialCommunityIcons name="send" size={22} color="#fff" />
+            </TouchableOpacity>
+          </View>
+        </KeyboardAvoidingView>
+      </SafeAreaView>
+    </ImageBackground>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "white",
   },
-  header: {
-    backgroundColor: "#1565C0",
-  },
-  headerTitle: {
-    color: "white",
-    fontSize: 20,
-    fontWeight: "bold",
-  },
-  chatContainer: {
+  bg: {
     flex: 1,
+    backgroundColor: "#0a0f24",
   },
-  messagesList: {
-    flex: 1,
-    paddingVertical: 8,
+  appHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 18,
+    paddingTop: 4,
+    paddingBottom: 8,
+    backgroundColor: "rgba(20,25,55,0.9)",
+    borderBottomWidth: 0.6,
+    borderColor: "#294fb3",
   },
-  loadingContainer: {
+  headerLeft: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
-    paddingVertical: 12,
   },
-  loadingText: {
-    marginLeft: 8,
-    color: "#666",
+  headerText: {
+    marginLeft: 10,
   },
-  inputContainer: {
+  headerTitle: {
+    color: "#fff",
+    fontWeight: "700",
+    fontSize: 18,
+  },
+  subHeader: {
+    fontSize: 11,
+    color: "#73b1ff",
+  },
+  profileButton: {
+    padding: 4,
+  },
+  listContent: {
+    paddingHorizontal: 10,
+    paddingBottom: 20,
+  },
+  loaderContainer: {
+    alignItems: "center",
+    marginBottom: 10,
+  },
+  thinkingText: {
+    fontSize: 12,
+    color: "#888",
+    marginTop: 4,
+  },
+  inputBar: {
     flexDirection: "row",
-    padding: 12,
-    alignItems: "flex-end",
-    backgroundColor: "white",
-    borderTopWidth: 1,
-    borderTopColor: "#e0e0e0",
+    alignItems: "center",
+    backgroundColor: "rgba(255,255,255,0.1)",
+    borderTopWidth: 0.5,
+    borderColor: "#294fb3",
+    marginHorizontal: 10,
+    borderRadius: 30,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    marginBottom: 8,
   },
-  textInput: {
+  textBox: {
     flex: 1,
-    marginRight: 8,
-    maxHeight: 100,
+    color: "#fff",
+    fontSize: 15,
+    paddingVertical: 4,
+    maxHeight: 110,
   },
   sendButton: {
-    margin: 0,
-  },
-  sendButtonActive: {
-    backgroundColor: "#1565C0",
+    backgroundColor: "#00b8f4",
+    borderRadius: 24,
+    padding: 8,
+    marginLeft: 8,
   },
 });
 

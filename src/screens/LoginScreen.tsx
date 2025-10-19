@@ -1,5 +1,12 @@
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import React, { useState } from "react";
-import { Alert, StyleSheet, View } from "react-native";
+import {
+  ImageBackground,
+  KeyboardAvoidingView,
+  Platform,
+  StyleSheet,
+  TouchableOpacity,
+} from "react-native";
 import {
   Button,
   Card,
@@ -9,6 +16,7 @@ import {
   Title,
 } from "react-native-paper";
 import { useDispatch } from "react-redux";
+import { useGoogleAuth } from "../hooks/useGoogleAuth";
 import authService from "../services/authService";
 import {
   loginFailure,
@@ -16,25 +24,21 @@ import {
   loginSuccess,
 } from "../store/slices/authSlice";
 
-interface Props {
-  navigation: any;
-}
-
-const LoginScreen: React.FC<Props> = ({ navigation }) => {
+const LoginScreen = ({ navigation }: any) => {
+  const dispatch = useDispatch();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const dispatch = useDispatch();
+
+  const { promptAsync, request } = useGoogleAuth();
 
   const handleEmailLogin = async () => {
     if (!email || !password) {
-      Alert.alert("Error", "Please fill in all fields");
+      alert("Please fill all fields.");
       return;
     }
-
     setLoading(true);
     dispatch(loginStart());
-
     try {
       const user = await authService.signInWithEmail(email, password);
       dispatch(
@@ -45,120 +49,136 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
           photoURL: user.photoURL || undefined,
         })
       );
-    } catch (error: any) {
-      dispatch(loginFailure(error.message));
-      Alert.alert("Login Failed", error.message);
+    } catch (err: any) {
+      dispatch(loginFailure(err.message));
+      alert("Login failed: " + err.message);
     } finally {
       setLoading(false);
     }
   };
 
-  // ✅ Disabled Google Login for now
-  const handleGoogleLogin = async () => {
-    Alert.alert(
-      "Coming Soon",
-      "Google Sign-In will be available soon. Please use email login for now.",
-      [{ text: "OK" }]
-    );
-  };
-
   return (
-    <View style={styles.container}>
-      <Card style={styles.card}>
-        <Card.Content>
-          <Title style={styles.title}>Welcome to AIVAK AI Assistant</Title>
-          <Text style={styles.subtitle}>Your Business AI Companion</Text>
+    <ImageBackground
+      source={{
+        uri: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1500&q=80",
+      }}
+      style={styles.bg}
+      imageStyle={{ opacity: 0.15 }}
+    >
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={styles.container}
+      >
+        <Card style={styles.card}>
+          <Card.Content>
+            <Title style={styles.title}>Welcome to AIVAK</Title>
+            <Text style={styles.subtitle}>Your Future Business Assistant</Text>
 
-          <TextInput
-            label="Email"
-            value={email}
-            onChangeText={setEmail}
-            mode="outlined"
-            style={styles.input}
-            keyboardType="email-address"
-            autoCapitalize="none"
-          />
+            <TextInput
+              label="Email"
+              mode="outlined"
+              value={email}
+              onChangeText={setEmail}
+              autoCapitalize="none"
+              style={styles.input}
+            />
 
-          <TextInput
-            label="Password"
-            value={password}
-            onChangeText={setPassword}
-            mode="outlined"
-            secureTextEntry
-            style={styles.input}
-          />
+            <TextInput
+              label="Password"
+              mode="outlined"
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry
+              style={styles.input}
+            />
 
-          <Button
-            mode="contained"
-            onPress={handleEmailLogin}
-            loading={loading}
-            disabled={loading}
-            style={styles.button}
-          >
-            Sign In
-          </Button>
+            <Button
+              mode="contained"
+              loading={loading}
+              disabled={loading}
+              style={styles.loginButton}
+              onPress={handleEmailLogin}
+            >
+              Sign In
+            </Button>
 
-          <Divider style={styles.divider} />
+            <Divider style={{ marginVertical: 16 }} />
 
-          {/* <Button
-            mode="outlined"
-            onPress={handleGoogleLogin}
-            disabled={true} // ✅ Disabled for now
-            style={[styles.button, styles.disabledButton]}
-            icon="google"
-          >
-            Continue with Google (Coming Soon)
-          </Button> */}
+            {/* Google Sign In */}
+            <TouchableOpacity
+              onPress={() => promptAsync()}
+              disabled={!request}
+              style={styles.googleBtn}
+            >
+              <MaterialCommunityIcons name="google" color="#DB4437" size={20} />
+              <Text style={styles.googleText}>Continue with Google</Text>
+            </TouchableOpacity>
 
-          <Button
-            mode="text"
-            onPress={() => navigation.navigate("Signup")}
-            style={styles.linkButton}
-          >
-            Don't have an account? Sign up
-          </Button>
-        </Card.Content>
-      </Card>
-    </View>
+            <Button
+              mode="text"
+              onPress={() => navigation.navigate("Signup")}
+              style={styles.linkBtn}
+            >
+              Don’t have an account? Sign up
+            </Button>
+          </Card.Content>
+        </Card>
+      </KeyboardAvoidingView>
+    </ImageBackground>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
     justifyContent: "center",
-    backgroundColor: "#f5f5f5",
+    paddingHorizontal: 16,
+  },
+  bg: {
+    flex: 1,
+    backgroundColor: "#0a0f24",
   },
   card: {
-    padding: 20,
+    borderRadius: 16,
+    backgroundColor: "rgba(255,255,255,0.07)",
   },
   title: {
-    fontSize: 24,
-    fontWeight: "bold",
     textAlign: "center",
-    marginBottom: 8,
-    color: "#1565C0",
+    color: "#fff",
+    fontSize: 26,
+    fontWeight: "bold",
+    marginBottom: 4,
   },
   subtitle: {
     textAlign: "center",
+    color: "#9ac1ff",
     marginBottom: 24,
-    color: "#666",
   },
   input: {
     marginBottom: 16,
+    backgroundColor: "rgba(255,255,255,0.1)",
   },
-  button: {
+  loginButton: {
     marginVertical: 8,
+    borderRadius: 24,
+    backgroundColor: "#00b8f4",
   },
-  disabledButton: {
-    opacity: 0.5,
+  googleBtn: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#FFF",
+    borderRadius: 24,
+    paddingVertical: 10,
   },
-  divider: {
-    marginVertical: 16,
+  googleText: {
+    marginLeft: 8,
+    fontWeight: "600",
+    color: "#000",
   },
-  linkButton: {
-    marginTop: 16,
+  linkBtn: {
+    marginTop: 12,
+    alignSelf: "center",
   },
 });
 
