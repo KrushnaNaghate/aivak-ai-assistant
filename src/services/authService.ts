@@ -6,7 +6,7 @@ import {
   updateProfile,
   User,
 } from "firebase/auth";
-import { auth } from "../../firebaseConfig";
+import { auth } from "../../firebaseConfig.js";
 
 class AuthService {
   async signUpWithEmail(

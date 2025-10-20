@@ -1,22 +1,17 @@
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
 import React, { useState } from "react";
 import {
-  ImageBackground,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  StatusBar,
   StyleSheet,
-  TouchableOpacity,
+  View,
 } from "react-native";
-import {
-  Button,
-  Card,
-  Divider,
-  Text,
-  TextInput,
-  Title,
-} from "react-native-paper";
+import { Button, Text } from "react-native-paper";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useDispatch } from "react-redux";
+import FloatingLabelInput from "../components/FloatingLabelInput";
 import { useGoogleAuth } from "../hooks/useGoogleAuth";
 import authService from "../services/authService";
 import {
@@ -31,7 +26,6 @@ const SignupScreen = ({ navigation }: any) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-
   const { promptAsync, request } = useGoogleAuth();
 
   const handleSignup = async () => {
@@ -60,148 +54,179 @@ const SignupScreen = ({ navigation }: any) => {
   };
 
   return (
-    <ImageBackground
-      source={{
-        uri: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1500&q=80",
-      }}
-      style={styles.bg}
-      imageStyle={{ opacity: 0.15 }}
-    >
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        style={styles.container}
+    <View style={styles.container}>
+      <StatusBar
+        barStyle="light-content"
+        backgroundColor="transparent"
+        translucent
+      />
+      <LinearGradient
+        colors={["#0F1419", "#1A1F3A", "#0F1419"]}
+        style={styles.gradient}
       >
-        <ScrollView
-          contentContainerStyle={{ flexGrow: 1, justifyContent: "center" }}
-          keyboardShouldPersistTaps="handled"
-        >
-          <Card style={styles.card}>
-            <Card.Content>
-              <Title style={styles.title}>Join AIVAK</Title>
-              <Text style={styles.subtitle}>
-                Create your future business assistant account
-              </Text>
+        <SafeAreaView style={styles.safeArea} edges={["top"]}>
+          <KeyboardAvoidingView
+            behavior={Platform.OS === "ios" ? "padding" : undefined}
+            style={styles.keyboardView}
+          >
+            <ScrollView
+              contentContainerStyle={styles.scrollContent}
+              keyboardShouldPersistTaps="handled"
+              showsVerticalScrollIndicator={false}
+            >
+              <View style={styles.header}>
+                <Text style={styles.title}>Join AIVAK</Text>
+                <Text style={styles.subtitle}>
+                  Create your AI assistant account
+                </Text>
+              </View>
 
-              <TextInput
-                label="Full Name"
-                mode="outlined"
-                value={fullName}
-                onChangeText={setFullName}
-                style={styles.input}
-                autoCapitalize="words"
-              />
-
-              <TextInput
-                label="Email"
-                mode="outlined"
-                value={email}
-                onChangeText={setEmail}
-                style={styles.input}
-                keyboardType="email-address"
-                autoCapitalize="none"
-              />
-
-              <TextInput
-                label="Password"
-                mode="outlined"
-                value={password}
-                onChangeText={setPassword}
-                style={styles.input}
-                secureTextEntry
-              />
-
-              <Button
-                mode="contained"
-                loading={loading}
-                disabled={loading}
-                style={styles.signupButton}
-                onPress={handleSignup}
-              >
-                Create Account
-              </Button>
-
-              <Divider style={{ marginVertical: 16 }} />
-
-              {/* Google Signup */}
-              <TouchableOpacity
-                onPress={() => promptAsync()}
-                disabled={!request || loading}
-                style={[styles.googleBtn, loading && { opacity: 0.6 }]}
-              >
-                <MaterialCommunityIcons
-                  name="google"
-                  color="#DB4437"
-                  size={20}
+              <View style={styles.card}>
+                <FloatingLabelInput
+                  label="Full Name"
+                  value={fullName}
+                  onChangeText={setFullName}
+                  autoCapitalize="words"
                 />
-                <Text style={styles.googleText}>Sign Up with Google</Text>
-              </TouchableOpacity>
 
-              <Button
-                mode="text"
-                onPress={() => navigation.navigate("Login")}
-                style={styles.linkBtn}
-              >
-                Already have an account? Sign In
-              </Button>
-            </Card.Content>
-          </Card>
-        </ScrollView>
-      </KeyboardAvoidingView>
-    </ImageBackground>
+                <FloatingLabelInput
+                  label="Email Address"
+                  value={email}
+                  onChangeText={setEmail}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                />
+
+                <FloatingLabelInput
+                  label="Password"
+                  value={password}
+                  onChangeText={setPassword}
+                  secureTextEntry
+                />
+
+                <Button
+                  mode="contained"
+                  onPress={handleSignup}
+                  loading={loading}
+                  disabled={loading}
+                  style={styles.signUpButton}
+                  labelStyle={styles.buttonLabel}
+                >
+                  Create Account
+                </Button>
+
+                {/* <View style={styles.dividerContainer}>
+                  <Divider style={styles.divider} />
+                  <Text style={styles.dividerText}>OR</Text>
+                  <Divider style={styles.divider} />
+                </View>
+
+                <GoogleSignInButton
+                  onPress={() => promptAsync()}
+                  disabled={!request || loading}
+                  text="Sign Up with Google"
+                /> */}
+
+                <Button
+                  mode="text"
+                  onPress={() => navigation.navigate("Login")}
+                  style={styles.linkButton}
+                  labelStyle={styles.linkLabel}
+                >
+                  Already have an account?{" "}
+                  <Text style={styles.linkHighlight}>Sign In</Text>
+                </Button>
+              </View>
+            </ScrollView>
+          </KeyboardAvoidingView>
+        </SafeAreaView>
+      </LinearGradient>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: 16,
+    backgroundColor: "#0F1419",
   },
-  bg: {
+  gradient: {
     flex: 1,
-    backgroundColor: "#0a0f24",
   },
-  card: {
-    borderRadius: 16,
-    backgroundColor: "rgba(255,255,255,0.07)",
-    paddingVertical: 12,
+  safeArea: {
+    flex: 1,
+  },
+  keyboardView: {
+    flex: 1,
+  },
+  scrollContent: {
+    flexGrow: 1,
+    justifyContent: "center",
+    paddingHorizontal: 24,
+    paddingVertical: 40,
+  },
+  header: {
+    alignItems: "center",
+    marginBottom: 40,
   },
   title: {
-    textAlign: "center",
-    color: "#fff",
-    fontSize: 26,
+    fontSize: 32,
     fontWeight: "bold",
-    marginBottom: 4,
+    color: "#FFFFFF",
+    marginBottom: 8,
   },
   subtitle: {
-    textAlign: "center",
-    color: "#9ac1ff",
-    marginBottom: 24,
+    fontSize: 16,
+    color: "#8B93A7",
+    letterSpacing: 0.5,
   },
-  input: {
-    marginBottom: 16,
-    backgroundColor: "rgba(255,255,255,0.1)",
-  },
-  signupButton: {
-    marginVertical: 8,
+  card: {
+    backgroundColor: "#1E2337",
     borderRadius: 24,
-    backgroundColor: "#00b8f4",
+    padding: 28,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.3,
+    shadowRadius: 16,
+    elevation: 10,
   },
-  googleBtn: {
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#FFF",
-    borderRadius: 24,
-    paddingVertical: 10,
+  signUpButton: {
+    marginTop: 8,
+    marginBottom: 20,
+    borderRadius: 16,
+    paddingVertical: 6,
+    backgroundColor: "#00D9FF",
   },
-  googleText: {
-    marginLeft: 8,
+  buttonLabel: {
+    fontSize: 16,
     fontWeight: "600",
-    color: "#000",
+    letterSpacing: 0.5,
   },
-  linkBtn: {
-    marginTop: 12,
-    alignSelf: "center",
+  dividerContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginVertical: 24,
+  },
+  divider: {
+    flex: 1,
+    height: 1,
+    backgroundColor: "#2A3048",
+  },
+  dividerText: {
+    marginHorizontal: 16,
+    color: "#8B93A7",
+    fontSize: 14,
+  },
+  linkButton: {
+    marginTop: 20,
+  },
+  linkLabel: {
+    color: "#8B93A7",
+    fontSize: 14,
+  },
+  linkHighlight: {
+    color: "#00D9FF",
+    fontWeight: "600",
   },
 });
 

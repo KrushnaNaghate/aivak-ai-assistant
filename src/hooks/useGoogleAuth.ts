@@ -1,11 +1,18 @@
 import { makeRedirectUri } from "expo-auth-session";
 import * as Google from "expo-auth-session/providers/google";
+import Constants from "expo-constants"; //
 import * as WebBrowser from "expo-web-browser";
 import { GoogleAuthProvider, signInWithCredential } from "firebase/auth";
 import * as React from "react";
 import { useDispatch } from "react-redux";
-import { ANDROID_CLIENT_ID, WEB_CLIENT_ID } from "../../cred";
-import { auth } from "../../firebaseConfig";
+
+// Safely access the 'extra' field where we injected the secrets
+const extra = Constants.expoConfig?.extra ?? {};
+
+const ANDROID_CLIENT_ID = extra.ANDROID_CLIENT_ID;
+const WEB_CLIENT_ID = extra.WEB_CLIENT_ID;
+
+import { auth } from "../../firebaseConfig.js";
 import { loginSuccess } from "../store/slices/authSlice";
 
 WebBrowser.maybeCompleteAuthSession();

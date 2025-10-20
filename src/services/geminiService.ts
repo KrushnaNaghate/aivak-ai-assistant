@@ -1,7 +1,11 @@
 import axios from "axios";
+import Constants from "expo-constants"; //
 
-const GEMINI_API_KEY = "AI";
-const GEMINI_API_URL = "https://generative";
+// Safely access the 'extra' field where we injected the secrets
+const extra = Constants.expoConfig?.extra ?? {};
+
+const GEMINI_API_KEY = extra.GEMINI_API_KEY;
+const GEMINI_API_URL = extra.GEMINI_API_URL;
 
 interface Message {
   text: string;

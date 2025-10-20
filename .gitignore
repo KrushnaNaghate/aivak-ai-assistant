@@ -14,10 +14,8 @@ web-build/
 .env.production
 *.log
 
-# 🔒 SECURITY - Never commit these files
-firebaseConfig.js
+#  SECURITY - Never commit these files
 google-services.json
-src/services/geminiService.ts
 
 # OS generated files
 .DS_Store
@@ -27,6 +25,5 @@ src/services/geminiService.ts
 .Trashes
 ehthumbs.db
 Thumbs.db
-src/services/geminiService.ts
 
 cred.js

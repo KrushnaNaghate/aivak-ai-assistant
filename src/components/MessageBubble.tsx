@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useState } from "react";
 import { StyleSheet, View } from "react-native";
 import Markdown from "react-native-markdown-display";
 import { Avatar, Card, Text } from "react-native-paper";
+import TypewriterText from "./TypewriterText";
 
 interface Message {
   id: string;
@@ -12,24 +13,27 @@ interface Message {
 
 interface Props {
   message: Message;
+  showTypewriter?: boolean;
 }
 
-const MessageBubble: React.FC<Props> = ({ message }) => {
+const MessageBubble: React.FC<Props> = ({
+  message,
+  showTypewriter = false,
+}) => {
   const isUser = message.isUser;
+  const [showFullText, setShowFullText] = useState(false);
 
-  // ✅ Markdown styles for AI responses
   const markdownStyles = {
     body: {
-      color: isUser ? "white" : "#333",
-      fontSize: 16,
-      lineHeight: 20,
+      color: isUser ? "#FFFFFF" : "#1F1F1F",
+      fontSize: 15,
+      lineHeight: 22,
     },
     strong: {
-      color: isUser ? "white" : "#1565C0",
+      color: isUser ? "#FFFFFF" : "#00D9FF",
       fontWeight: "bold",
     },
     em: {
-      color: isUser ? "white" : "#333",
       fontStyle: "italic",
     },
     paragraph: {
@@ -48,21 +52,33 @@ const MessageBubble: React.FC<Props> = ({ message }) => {
 
   return (
     <View
-      key={message.id}
       style={[
         styles.container,
         isUser ? styles.userContainer : styles.botContainer,
       ]}
     >
-      {!isUser && <Avatar.Icon size={32} icon="robot" style={styles.avatar} />}
+      {!isUser && (
+        <Avatar.Icon
+          size={36}
+          icon="robot"
+          style={styles.avatar}
+          color="#00D9FF"
+        />
+      )}
 
       <Card
         style={[styles.bubble, isUser ? styles.userBubble : styles.botBubble]}
       >
         <Card.Content style={styles.content}>
-          {/* ✅ Use Markdown for AI responses, plain text for user */}
           {isUser ? (
-            <Text style={[styles.text, styles.userText]}>{message.text}</Text>
+            <Text style={styles.userText}>{message.text}</Text>
+          ) : showTypewriter && !showFullText ? (
+            <TypewriterText
+              text={message.text}
+              speed={20}
+              style={{ color: "#1F1F1F", fontSize: 15 }}
+              onComplete={() => setShowFullText(true)}
+            />
           ) : (
             <Markdown style={markdownStyles}>{message.text}</Markdown>
           )}
@@ -81,7 +97,14 @@ const MessageBubble: React.FC<Props> = ({ message }) => {
         </Card.Content>
       </Card>
 
-      {isUser && <Avatar.Icon size={32} icon="account" style={styles.avatar} />}
+      {isUser && (
+        <Avatar.Icon
+          size={36}
+          icon="account"
+          style={styles.avatar}
+          color="#00D9FF"
+        />
+      )}
     </View>
   );
 };
@@ -89,8 +112,8 @@ const MessageBubble: React.FC<Props> = ({ message }) => {
 const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
-    marginVertical: 4,
-    paddingHorizontal: 12,
+    marginVertical: 6,
+    // paddingHorizontal: 8,
     alignItems: "flex-end",
   },
   userContainer: {
@@ -101,38 +124,40 @@ const styles = StyleSheet.create({
   },
   avatar: {
     marginHorizontal: 8,
+    backgroundColor: "#1E2337",
   },
   bubble: {
     maxWidth: "75%",
     minWidth: "20%",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 3,
+    borderRadius: 12,
   },
   userBubble: {
-    backgroundColor: "#1565C0",
+    backgroundColor: "#00D9FF",
   },
   botBubble: {
-    backgroundColor: "#f5f5f5",
+    backgroundColor: "#FFFFFF",
   },
   content: {
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-  },
-  text: {
-    fontSize: 16,
-    lineHeight: 20,
+    paddingVertical: 10,
+    paddingHorizontal: 14,
   },
   userText: {
-    color: "white",
-  },
-  botText: {
-    color: "#333",
+    color: "#1F1F1F",
+    fontSize: 15,
+    lineHeight: 22,
   },
   timestamp: {
-    fontSize: 11,
+    fontSize: 10,
     marginTop: 4,
     opacity: 0.7,
   },
   userTimestamp: {
-    color: "white",
+    color: "#1F1F1F",
   },
   botTimestamp: {
     color: "#666",

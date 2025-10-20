@@ -13,7 +13,7 @@ import ProfileScreen from "../screens/ProfileScreen";
 import SignupScreen from "../screens/SignupScreen";
 
 import { onAuthStateChanged } from "firebase/auth";
-import { auth } from "../../firebaseConfig";
+import { auth } from "../../firebaseConfig.js";
 
 const Stack = createNativeStackNavigator();
 
