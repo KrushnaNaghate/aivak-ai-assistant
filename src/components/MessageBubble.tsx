@@ -75,7 +75,7 @@ const MessageBubble: React.FC<Props> = ({
           ) : showTypewriter && !showFullText ? (
             <TypewriterText
               text={message.text}
-              speed={20}
+              speed={10}
               style={{ color: "#1F1F1F", fontSize: 15 }}
               onComplete={() => setShowFullText(true)}
             />

@@ -20,7 +20,7 @@ const FloatingLabelInput: React.FC<FloatingLabelInputProps> = ({
   label,
   value,
   onChangeText,
-  secureTextEntry, // Prop to determine if it's a password field
+  secureTextEntry, // paasowrd
   keyboardType,
   autoCapitalize,
   ...props
@@ -108,7 +108,7 @@ const FloatingLabelInput: React.FC<FloatingLabelInputProps> = ({
 const styles = StyleSheet.create({
   container: {
     marginBottom: 20,
-    width: "100%", // Ensure it takes full width of its parent
+    width: "100%",
   },
   inputWrapper: {
     justifyContent: "center",

@@ -52,7 +52,6 @@ const chatSlice = createSlice({
       state.error = action.payload;
     },
     initSession: (state) => {
-      // Only initialize if session doesn't exist
       if (!state.sessionId) {
         state.sessionId = Date.now().toString();
       }
@@ -73,13 +72,12 @@ const chatSlice = createSlice({
     resetChat: (state) => {
       return initialState;
     },
-    // Add a method to reinitialize chat with welcome message
     reinitializeChat: (state, action: PayloadAction<{ user?: any }>) => {
       state.messages = [];
       state.sessionId = Date.now().toString();
       state.sessionContext = {};
 
-      // Add welcome message
+      // welcome message
       const welcomeMessage = {
         id: "welcome-message-" + Date.now(),
         text: `Hello ${
@@ -93,7 +91,6 @@ const chatSlice = createSlice({
   },
 });
 
-// ✅ Export ALL actions including the missing ones
 export const {
   addMessage,
   setLoading,

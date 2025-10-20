@@ -128,7 +128,6 @@ Remember: You're helping business owners make informed decisions that impact the
     messages: Message[],
     currentMessage: string
   ): string {
-    // Get last 6 messages for context (excluding welcome message)
     const recentMessages = messages
       .filter((msg) => !msg.text.includes("Hello") && !msg.text.includes("👋"))
       .slice(-6)
@@ -142,10 +141,8 @@ Remember: You're helping business owners make informed decisions that impact the
   }
 
   private processResponse(response: string): string {
-    // Clean up the response
     let processedResponse = response.trim();
 
-    // Remove any AI prefix if present
     processedResponse = processedResponse.replace(
       /^(AI Assistant|AIVAK):\s*/i,
       ""

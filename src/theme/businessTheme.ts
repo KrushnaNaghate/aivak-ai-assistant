@@ -1,6 +1,6 @@
 import { MD3DarkTheme, configureFonts } from "react-native-paper";
 
-// Neumorphic color palette - Dark futuristic
+// Neumorphic color palette
 const neumorphicColors = {
   primary: "#00D9FF", // Cyan glow
   secondary: "#7B61FF", // Purple accent
@@ -50,7 +50,7 @@ export const neumorphicTheme = {
   roundness: 20,
 };
 
-// Neumorphic shadow styles
+// Neumorphic
 export const neumorphicShadow = {
   lightShadow: {
     shadowColor: "rgba(255, 255, 255, 0.1)",

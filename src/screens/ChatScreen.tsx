@@ -29,7 +29,6 @@ import {
 } from "../store/slices/chatSlice";
 import { RootState } from "../store/store";
 
-// Enable LayoutAnimation on Android
 if (
   Platform.OS === "android" &&
   UIManager.setLayoutAnimationEnabledExperimental

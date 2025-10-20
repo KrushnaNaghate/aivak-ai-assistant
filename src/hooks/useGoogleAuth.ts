@@ -6,7 +6,6 @@ import { GoogleAuthProvider, signInWithCredential } from "firebase/auth";
 import * as React from "react";
 import { useDispatch } from "react-redux";
 
-// Safely access the 'extra' field where we injected the secrets
 const extra = Constants.expoConfig?.extra ?? {};
 
 const ANDROID_CLIENT_ID = extra.ANDROID_CLIENT_ID;

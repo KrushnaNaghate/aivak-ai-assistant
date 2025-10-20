@@ -21,7 +21,7 @@ class AuthService {
         password
       );
 
-      // Update user profile if displayName provided
+      //  user profile
       if (displayName) {
         await updateProfile(result.user, {
           displayName: displayName.trim(),

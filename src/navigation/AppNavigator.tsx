@@ -55,11 +55,7 @@ const AppNavigator: React.FC = () => {
         {isAuthenticated ? (
           // Authenticated Stack
           <>
-            <Stack.Screen
-              name="Chat"
-              component={ChatScreen}
-              key={user?.id} // Force re-render when user changes
-            />
+            <Stack.Screen name="Chat" component={ChatScreen} key={user?.id} />
             <Stack.Screen
               name="Profile"
               component={ProfileScreen}

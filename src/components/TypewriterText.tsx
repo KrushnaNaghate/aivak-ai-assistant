@@ -10,7 +10,7 @@ interface TypewriterTextProps {
 
 const TypewriterText: React.FC<TypewriterTextProps> = ({
   text,
-  speed = 30,
+  speed = 20,
   style,
   onComplete,
 }) => {
